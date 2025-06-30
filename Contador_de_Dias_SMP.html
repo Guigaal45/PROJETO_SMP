@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Dias SMP - Minecraft</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
+
+        body {
+            background-color: #0A0A10;
+            color: #00E6FF;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .counter-container {
+            background-color: rgba(10, 10, 20, 0.7);
+            border: 1px solid #00E6FF;
+            box-shadow: 0 0 30px rgba(0, 230, 255, 0.5),
+                        inset 0 0 15px rgba(0, 230, 255, 0.3);
+            padding: 40px 60px;
+            text-align: center;
+            border-radius: 12px;
+            max-width: 800px; /* Um pouco mais largo para acomodar o texto */
+            width: 90%;
+            animation: pulse-glow-modern 3s infinite alternate;
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes pulse-glow-modern {
+            0% { box-shadow: 0 0 30px rgba(0, 230, 255, 0.5), inset 0 0 15px rgba(0, 230, 255, 0.3); }
+            100% { box-shadow: 0 0 50px rgba(0, 230, 255, 0.8), inset 0 0 25px rgba(0, 230, 255, 0.5); }
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5em;
+            color: #00FFFF;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+            letter-spacing: 2px;
+        }
+
+        .day-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 7em; /* Maior ainda para o número do dia */
+            font-weight: 700;
+            color: #FFD700; /* Dourado para destacar o dia */
+            text-shadow: 0 0 40px rgba(255, 215, 0, 1);
+            margin-bottom: 25px;
+            letter-spacing: 5px;
+        }
+
+        .time-in-day-display {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2em; /* Tamanho do tempo dentro do dia */
+            color: #00E6FF;
+            text-shadow: 0 0 15px rgba(0, 230, 255, 0.8);
+            margin-top: 15px;
+        }
+
+        .buttons-container {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Espaço entre os botões */
+        }
+
+        .action-button {
+            background-color: #0088AA; /* Um azul mais escuro para os botões */
+            color: #FFFFFF;
+            border: 1px solid #00E6FF;
+            padding: 15px 30px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 230, 255, 0.4);
+            transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+            border-radius: 8px; /* Cantos arredondados */
+        }
+
+        .action-button:hover {
+            background-color: #00E6FF;
+            color: #0A0A10; /* Texto escuro no hover */
+            box-shadow: 0 0 20px rgba(0, 230, 255, 0.8);
+            transform: translateY(-2px); /* Efeito de "levantar" */
+        }
+
+        .action-button:active {
+            background-color: #005577; /* Azul mais escuro ao clicar */
+            box-shadow: inset 0 0 10px rgba(0, 230, 255, 0.6);
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="counter-container">
+        <h1>DIAS NO SMP</h1>
+        <div id="minecraftDay" class="day-display">DIA 1</div>
+        <div id="timeInDay" class="time-in-day-display">00:00</div>
+
+        <div class="buttons-container">
+            <button class="action-button" onclick="startCounter()">INICIAR CONTADOR</button>
+            <button class="action-button" onclick="pauseCounter()">PAUSAR CONTADOR</button>
+            <button class="action-button" onclick="resetCounter()">REINICIAR PARA DIA 1</button>
+        </div>
+    </div>
+
+    <script>
+        const MS_PER_MINECRAFT_DAY = 60 * 60 * 1000; // 60 minutos (1 hora) em milissegundos
+        let startTime = localStorage.getItem('smpCounterStartTime') ? parseInt(localStorage.getItem('smpCounterStartTime')) : null;
+        let elapsedPausedTime = localStorage.getItem('smpCounterPausedTime') ? parseInt(localStorage.getItem('smpCounterPausedTime')) : 0; // Tempo acumulado quando pausado
+        let intervalId;
+        let isRunning = false;
+
+        const minecraftDayDisplay = document.getElementById('minecraftDay');
+        const timeInDayDisplay = document.getElementById('timeInDay');
+
+        function updateCounter() {
+            let now = Date.now();
+            let totalElapsedTime = elapsedPausedTime;
+
+            if (isRunning && startTime !== null) {
+                totalElapsedTime += (now - startTime);
+            } else if (!isRunning && startTime === null && elapsedPausedTime === 0) {
+                // Se ainda não começou, exibe o estado inicial
+                minecraftDayDisplay.textContent = `DIA 1`;
+                timeInDayDisplay.textContent = `00:00`;
+                return;
+            }
+
+            const totalMinecraftDays = totalElapsedTime / MS_PER_MINECRAFT_DAY;
+            const currentDay = Math.floor(totalMinecraftDays) + 1; // Dia começa do 1
+
+            const timeIntoCurrentDayMs = totalElapsedTime % MS_PER_MINECRAFT_DAY;
+            const minutesIntoDay = Math.floor(timeIntoCurrentDayMs / (60 * 1000));
+            const secondsIntoDay = Math.floor((timeIntoCurrentDayMs % (60 * 1000)) / 1000);
+
+            minecraftDayDisplay.textContent = `DIA ${currentDay}`;
+            timeInDayDisplay.textContent =
+                `${String(minutesIntoDay).padStart(2, '0')}:${String(secondsIntoDay).padStart(2, '0')}`;
+
+            // Salva o tempo atual se estiver rodando para persistência
+            if (isRunning) {
+                localStorage.setItem('smpCounterStartTime', startTime);
+                localStorage.setItem('smpCounterPausedTime', elapsedPausedTime);
+            }
+        }
+
+        function startCounter() {
+            if (!isRunning) {
+                startTime = Date.now(); // Marca o início da contagem (ou do recomeço)
+                isRunning = true;
+                intervalId = setInterval(updateCounter, 1000); // Atualiza a cada segundo
+                updateCounter(); // Atualiza imediatamente ao iniciar
+                localStorage.setItem('smpCounterRunning', 'true');
+            }
+        }
+
+        function pauseCounter() {
+            if (isRunning) {
+                clearInterval(intervalId);
+                const now = Date.now();
+                elapsedPausedTime += (now - startTime); // Acumula o tempo que passou desde o início/recomeço
+                startTime = null; // Reinicia o startTime para o próximo 'start'
+                isRunning = false;
+                localStorage.setItem('smpCounterPausedTime', elapsedPausedTime);
+                localStorage.setItem('smpCounterRunning', 'false');
+            }
+        }
+
+        function resetCounter() {
+            clearInterval(intervalId);
+            startTime = null;
+            elapsedPausedTime = 0;
+            isRunning = false;
+            minecraftDayDisplay.textContent = `DIA 1`;
+            timeInDayDisplay.textContent = `00:00`;
+            localStorage.removeItem('smpCounterStartTime');
+            localStorage.removeItem('smpCounterPausedTime');
+            localStorage.removeItem('smpCounterRunning');
+        }
+
+        // Recuperar estado ao carregar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('smpCounterRunning') === 'true') {
+                // Se estava rodando, tenta retomar. startTime precisa ser recalculado.
+                // Isso é um pouco mais complexo se a aba foi fechada.
+                // Para simplicidade, vamos apenas chamar startCounter que recalcula startTime.
+                // Se você quer uma persistência perfeita entre fechamento de abas, precisaria salvar o timestamp real do início.
+                // Para este caso de "um relógio que você abre e mantém aberto", ele funciona bem.
+                startCounter();
+            } else {
+                updateCounter(); // Apenas mostra o estado salvo ou o inicial
+            }
+        });
+    </script>
+</body>
+</html>
