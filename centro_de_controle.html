@@ -1,221 +1,230 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Centro de Controle da Base - SMP</title>
-<style>
-    /* Importa a fonte pixelada dos anos 80 */
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Importa a fonte pixelada dos anos 80 (já estava no link acima, mas deixei aqui também para clareza) */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-    body {
-        background-color: #000000; /* Fundo preto absoluto */
-        color: #00FF00; /* Texto verde neon intenso */
-        font-family: 'Press Start 2P', monospace; /* Fonte pixelada principal */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-        overflow: hidden;
-        /* Efeito de Scanlines CRT BEM visível e animado */
-        background-image:
-            linear-gradient(rgba(0, 255, 0, 0.15) 1px, transparent 1px), /* Linhas horizontais */
-            linear-gradient(90deg, rgba(0, 255, 0, 0.08) 1px, transparent 1px); /* Linhas verticais */
-        background-size: 2px 2px; /* Tamanho das "células" da grade */
-        background-position: 0 0;
-        animation: scanlineScroll 15s linear infinite; /* Animação de rolagem lenta */
-        filter: brightness(1.2) contrast(1.1); /* Brilho e contraste para simular luz de CRT */
-        text-rendering: optimizeLegibility; /* Tenta renderizar o texto de forma mais pixelada se possível */
-    }
+        body {
+            background-color: #000000; /* Fundo preto absoluto */
+            color: #00FF00; /* Texto verde CRT intenso */
+            font-family: 'Press Start 2P', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Evita scrollbars */
+            position: relative; /* Necessário para os pseudo-elementos de ruído/flicker */
 
-    /* Animação para simular o movimento das scanlines */
-    @keyframes scanlineScroll {
-        from { background-position: 0 0; }
-        to { background-position: 0 200%; } /* Rolagem lenta para baixo */
-    }
+            /* Scanlines BEM visíveis e estáticas (para fixar a grade de pixels) */
+            background-image:
+                linear-gradient(rgba(0, 255, 0, 0.25) 1px, transparent 1px), /* Horizontais mais fortes */
+                linear-gradient(90deg, rgba(0, 255, 0, 0.15) 1px, transparent 1px); /* Verticais mais fortes */
+            background-size: 2px 2px; /* Tamanho da "célula" do pixel */
 
-    .control-panel {
-        background-color: #010101; /* Quase preto para o fundo do painel */
-        border: 4px solid #00DD00; /* Borda grossa e verde mais forte */
-        padding: 40px; /* Muito padding */
-        border-radius: 0; /* Totalmente quadrado */
-        box-shadow: 0 0 60px rgba(0, 255, 0, 0.8), inset 0 0 20px rgba(0, 255, 0, 0.3); /* Brilho externo super forte e interno */
-        width: 90%;
-        max-width: 1000px; /* Máxima largura para ocupar mais tela */
-        display: grid;
-        grid-template-columns: 1.8fr 1fr; /* Botões ainda mais proeminentes */
-        gap: 50px; /* Mais espaço entre as seções */
-        position: relative;
-        overflow: hidden; /* Garante que nada vaze */
-        /* Efeito de Curvatura de Tela CRT (simulado com border-radius grande no pai e corte com overflow) */
-        /* Isso é um truque, o 'overflow: hidden' no corpo impede isso de forma limpa.
-           Se quiser experimentar, remova o 'overflow: hidden' do body e adicione 'border-radius: 50% / 8%;' aqui e um 'filter: blur(0.5px);' */
-    }
+            /* Filtros para simular imperfeições do CRT */
+            filter:
+                brightness(1.5) /* Mais brilho */
+                contrast(1.2) /* Mais contraste */
+                saturate(1.5); /* Cores mais saturadas */
 
-    /* Simulação de reflexo/imperfeição da tela CRT */
-    .control-panel::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle at center, rgba(0, 255, 0, 0.08) 0%, transparent 60%);
-        pointer-events: none;
-        z-index: 1;
-        opacity: 0.9;
-    }
+            text-rendering: pixelated; /* Tenta forçar a renderização pixelada da fonte */
+            -webkit-font-smoothing: none; /* Desativa o anti-aliasing em WebKit (Chrome/Safari) */
+        }
 
-    h1, h2 {
-        grid-column: 1 / -1;
-        text-align: center;
-        color: #00FF00;
-        text-shadow: 0 0 25px rgba(0, 255, 0, 1.0), 0 0 40px rgba(0, 255, 0, 0.6), 0 0 60px rgba(0, 255, 0, 0.3); /* Brilho extremo */
-        margin-bottom: 40px;
-        font-size: 3.5em; /* Títulos gigantescos */
-        letter-spacing: 6px; /* Muito espaçamento */
-        word-wrap: break-word;
-        line-height: 1.2; /* Espaçamento entre linhas */
-    }
+        /* Simulação de ruído e flicker (cintilação) */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(transparent 0%, rgba(0, 0, 0, 0.1) 0.5%, transparent 1%);
+            opacity: 0.1;
+            animation: noise 0.5s infinite steps(10);
+            pointer-events: none; /* Garante que não interfira com cliques */
+        }
 
-    h2 {
-        font-size: 2.5em;
-        color: #00FFFF; /* Ciano para subtítulos, mas ainda forte */
-        text-shadow: 0 0 20px rgba(0, 255, 255, 1.0), 0 0 35px rgba(0, 255, 255, 0.6);
-        margin-bottom: 20px;
-        letter-spacing: 3px;
-    }
+        body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.1); /* Um leve escurecimento para o flicker */
+            animation: flicker 0.1s infinite alternate;
+            pointer-events: none; /* Garante que não interfira com cliques */
+        }
 
-    /* Seção de Botões */
-    .section-buttons {
-        grid-column: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 30px; /* Mais espaço */
-    }
+        /* Animação de flicker (mudança sutil de opacidade/brilho) */
+        @keyframes flicker {
+            0% { opacity: 0.85; }
+            50% { opacity: 0.9; }
+            100% { opacity: 0.85; }
+        }
 
-    .action-button {
-        background-color: #004400; /* Verde escuro para o botão */
-        color: #00FF00;
-        border: 4px outset #00AA00; /* Borda 3D mais pronunciada */
-        padding: 25px;
-        font-size: 1.8em; /* Fonte ainda maior */
-        cursor: pointer;
-        border-radius: 0; /* Sem arredondamento */
-        transition: background-color 0.05s, box-shadow 0.05s, color 0.05s; /* Transição super rápida */
-        text-align: center;
-        text-shadow: 0 0 15px rgba(0, 255, 0, 1.0); /* Brilho forte no texto */
-        box-shadow: 8px 8px 20px rgba(0, 255, 0, 0.5); /* Sombra de profundidade forte */
-        letter-spacing: 2px;
-    }
+        /* Animação de ruído (movimento de pixels aleatório) */
+        @keyframes noise {
+            0% { background-position: 0 0; }
+            100% { background-position: 100% 100%; }
+        }
 
-    .action-button:hover {
-        background-color: #006600;
-        box-shadow: 8px 8px 25px rgba(0, 255, 0, 1.0);
-        color: #33FF33;
-    }
+        .control-panel {
+            background-color: rgba(0, 50, 0, 0.2); /* Um fundo verde escuro translúcido para o painel */
+            border: 2px solid #00FF00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+            padding: 20px 30px;
+            text-align: center;
+            border-radius: 8px;
+            max-width: 900px;
+            width: 90%;
+            animation: pulsate-glow 2s infinite alternate; /* Efeito de pulsação na borda */
+        }
 
-    .action-button:active {
-        background-color: #007700;
-        border-style: inset; /* Simula o botão sendo pressionado */
-        box-shadow: 4px 4px 15px rgba(0, 255, 0, 0.8);
-        transform: translateY(4px); /* Deslocamento maior ao pressionar */
-    }
+        @keyframes pulsate-glow {
+            0% { box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); }
+            100% { box-shadow: 0 0 25px rgba(0, 255, 0, 1), 0 0 5px rgba(0, 255, 0, 0.5); }
+        }
 
-    /* Seção de Status */
-    .section-status {
-        grid-column: 2;
-        display: flex;
-        flex-direction: column;
-        gap: 25px; /* Espaço entre itens de status */
-    }
+        h1, h2 {
+            margin-bottom: 20px;
+            text-shadow: 0 0 8px rgba(0, 255, 0, 0.8);
+            font-size: 1.8em; /* Ajuste para melhor legibilidade */
+        }
 
-    .status-item {
-        display: flex;
-        align-items: center;
-        gap: 25px; /* Mais espaço entre luz e texto */
-        font-size: 1.5em; /* Fonte maior para status */
-        background-color: #020202; /* Fundo mais escuro para o item de status */
-        border: 2px dashed #008800; /* Borda tracejada mais visível */
-        padding: 20px;
-        border-radius: 0;
-        box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.5); /* Sombra interna mais forte */
-    }
+        .section-buttons, .section-status, .section-countdown {
+            margin-bottom: 30px;
+            border-top: 1px dashed #008800; /* Linhas divisórias pontilhadas */
+            padding-top: 20px;
+        }
+        .section-buttons:first-child {
+            border-top: none; /* Remove a linha de cima do primeiro elemento */
+        }
 
-    .status-light {
-        width: 35px; /* Luz bem maior */
-        height: 35px;
-        border-radius: 50%;
-        background-color: #333; /* Cor padrão */
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.6); /* Brilho de luz apagada */
-        transition: background-color 0.4s, box-shadow 0.4s;
-        border: 3px solid #555; /* Borda da luz mais grossa */
-    }
+        .action-button {
+            background-color: #00AA00; /* Botão verde escuro */
+            color: #000000; /* Texto preto para contraste */
+            border: 2px solid #00FF00;
+            padding: 12px 25px;
+            margin: 8px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.9em;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+            transition: background-color 0.1s, box-shadow 0.1s;
+            text-shadow: none; /* Remove o text-shadow para o texto do botão */
+        }
 
-    /* Cores dos status com brilho mais intenso */
-    .status-light.green {
-        background-color: #00FF00;
-        box-shadow: 0 0 30px rgba(0, 255, 0, 1.0), 0 0 50px rgba(0, 255, 0, 0.7);
-        border-color: #33FF33;
-    }
-    .status-light.red {
-        background-color: #FF0000;
-        box-shadow: 0 0 30px rgba(255, 0, 0, 1.0), 0 0 50px rgba(255, 0, 0, 0.7);
-        border-color: #FF3333;
-    }
-    .status-light.yellow {
-        background-color: #FFFF00;
-        box-shadow: 0 0 30px rgba(255, 255, 0, 1.0), 0 0 50px rgba(255, 255, 0, 0.7);
-        border-color: #FFFF33;
-    }
+        .action-button:hover {
+            background-color: #00FF00; /* Verde mais claro no hover */
+            color: #000000;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 1);
+        }
 
-    /* Seção de Contador Regressivo */
-    .section-countdown {
-        grid-column: 1 / -1;
-        text-align: center;
-        margin-top: 50px;
-        background-color: #020202;
-        border: 3px solid #00DD00;
-        padding: 30px;
-        border-radius: 0;
-        box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.5); /* Sombra interna mais forte */
-    }
+        .action-button:active {
+            background-color: #008800; /* Verde mais escuro ao clicar */
+            box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.8);
+        }
 
-    .countdown-display {
-        font-size: 5em; /* Fonte GIGANTESCA para o timer */
-        color: #00FFFF;
-        text-shadow: 0 0 30px rgba(0, 255, 255, 1.0), 0 0 50px rgba(0, 255, 255, 0.7);
-        margin-top: 25px;
-        letter-spacing: 8px; /* Espaçamento de letras super marcante */
-    }
+        .status-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
 
-    /* Pop-up de Mensagem (também estilizado para a época) */
-    .popup-message {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: rgba(0, 0, 0, 0.99); /* Fundo quase totalmente opaco */
-        color: #00FF00;
-        border: 4px solid #00FF00;
-        padding: 35px 60px;
-        border-radius: 0;
-        box-shadow: 0 0 60px rgba(0, 255, 0, 1.0); /* Brilho extremo */
-        z-index: 1000;
-        font-size: 2.5em; /* Fonte maior no pop-up */
-        text-align: center;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-        letter-spacing: 3px;
-    }
-    .popup-message.show {
-        opacity: 1;
-        visibility: visible;
-    }
-</style>
+        .status-light {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 15px;
+            border: 1px solid rgba(0, 255, 0, 0.8);
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+            animation: pulse-light 1.5s infinite alternate; /* Efeito de pulsação nas luzes */
+        }
+
+        /* Cores dos LEDs */
+        .status-light.green { background-color: #00FF00; box-shadow: 0 0 8px #00FF00; }
+        .status-light.red { background-color: #FF0000; box-shadow: 0 0 8px #FF0000; }
+        .status-light.yellow { background-color: #FFFF00; box-shadow: 0 0 8px #FFFF00; }
+
+        @keyframes pulse-light {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .countdown-display {
+            background-color: #001100; /* Fundo bem escuro para o display */
+            border: 1px solid #00FF00;
+            padding: 15px 20px;
+            font-size: 2.2em;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.9);
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.5); /* Sombra interna para profundidade */
+            letter-spacing: 2px; /* Espaçamento entre letras para efeito digital */
+        }
+
+        .popup-message {
+            position: fixed;
+            bottom: 30px;
+            background-color: rgba(255, 0, 0, 0.8); /* Vermelho translúcido para alertas */
+            color: #FFFFFF;
+            padding: 15px 25px;
+            border: 2px solid #FF0000;
+            border-radius: 5px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.1em;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none; /* Garante que não bloqueie cliques */
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.9);
+            z-index: 1000; /* Garante que fique acima de outros elementos */
+        }
+
+        .popup-message.show {
+            opacity: 1;
+        }
+
+        /* Responsividade básica */
+        @media (max-width: 768px) {
+            .control-panel {
+                padding: 15px 20px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.2em;
+            }
+            .action-button {
+                font-size: 0.8em;
+                padding: 10px 20px;
+            }
+            .countdown-display {
+                font-size: 1.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-button {
+                display: block;
+                width: 90%;
+                margin: 10px auto;
+            }
+            .countdown-display {
+                font-size: 1.5em;
+            }
+        }
+
+    </style>
 </head>
 <body>
 
@@ -267,16 +276,20 @@
         function ativarDefesas() {
             showPopup('DEFESAS ATIVADAS! Alerta Laranja.');
             document.getElementById('statusDefesas').classList.remove('red');
-            document.getElementById('statusDefesas').classList.add('yellow');
-            document.getElementById('defesasText').textContent = 'ATIVAS';
+            document.getElementById('statusDefesas').classList.add('yellow'); // Altera para amarelo/alerta
+            document.getElementById('defesasText').textContent = 'ATIVAS (ALERTA)';
+            // Você pode adicionar mais lógica aqui, como iniciar um timer ou mudar outros status
         }
 
         function abrirPortao() {
             showPopup('PORTÃO PRINCIPAL ABERTO! Aguarde...');
-            // Exemplo de como você poderia mudar um status aqui
-            // document.getElementById('statusEnergia').classList.remove('green');
-            // document.getElementById('statusEnergia').classList.add('yellow');
-            // document.getElementById('energiaText').textContent = 'VARIÁVEL';
+            // Exemplo de como você poderia mudar um status aqui, talvez uma luz amarela temporária para o portão
+            // Para simplificar, vou mudar o status da energia temporariamente para 'amarelo'
+            alterarStatus('Energia', 'yellow');
+            setTimeout(() => {
+                alterarStatus('Energia', 'green'); // Volta para verde depois de um tempo
+                showPopup('PORTÃO FECHADO AUTOMATICAMENTE.');
+            }, 3000); // Portão aberto por 3 segundos
         }
 
         // Função para Alterar Status dos Indicadores
@@ -290,9 +303,18 @@
 
             // Muda o texto descritivo
             if (id === 'Energia') {
-                statusText.textContent = newStatus === 'green' ? 'ONLINE' : (newStatus === 'red' ? 'CRÍTICA' : 'VARIÁVEL');
+                statusText.textContent = newStatus === 'green' ? 'ONLINE' : (newStatus === 'red' ? 'CRÍTICA' : 'VARIAVEL');
             } else if (id === 'SistemaPrincipal') {
                 statusText.textContent = newStatus === 'green' ? 'OPERACIONAL' : (newStatus === 'red' ? 'FALHA CRÍTICA' : 'ANOMALIA');
+                // Se o sistema principal falhar, as defesas também devem ser afetadas
+                if (newStatus === 'red') {
+                    alterarStatus('Defesas', 'red');
+                    showPopup('ERRO CRÍTICO! DEFESAS DESATIVADAS!');
+                } else if (newStatus === 'green' && document.getElementById('statusDefesas').classList.contains('red')) {
+                    // Se o sistema principal for restaurado e as defesas estavam desligadas
+                    alterarStatus('Defesas', 'yellow'); // Coloca em alerta, mas não totalmente ativadas
+                    showPopup('DEFESAS PRONTAS PARA ATIVAÇÃO MANUAL.');
+                }
             } else if (id === 'Defesas') {
                 statusText.textContent = newStatus === 'green' ? 'ATIVAS' : (newStatus === 'red' ? 'INATIVAS' : 'ALERTA');
             }
@@ -302,7 +324,7 @@
         // Contador Regressivo
         const countdownElement = document.getElementById('countdown');
         // Defina a data/hora do seu evento (Ano, Mês-1, Dia, Hora, Minuto, Segundo)
-        // Exemplo: 1º de Julho de 2025, 18:00:00
+        // Exemplo: 1º de Julho de 2025, 18:00:00 (ajuste esta data para o que for mais relevante para o seu "SMP")
         const eventDate = new Date(2025, 6, 1, 18, 0, 0).getTime(); // Mês é 0-indexado (Julho = 6)
 
         function updateCountdown() {
@@ -317,7 +339,7 @@
 
             // Exibir o resultado
             if (distance > 0) {
-                countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                countdownElement.innerHTML = `${String(days).padStart(2, '0')}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
             } else {
                 countdownElement.innerHTML = "INVASÃO INICIADA!";
                 countdownElement.style.color = 'red';
