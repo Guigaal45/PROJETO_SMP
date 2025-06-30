@@ -1,39 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Centro de Controle da Base - SMP</title>
 <style>
+    /* Importa a fonte pixelada dos anos 80 */
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
     body {
         background-color: #000000; /* Fundo preto sólido */
-        color: #00FF00; /* Texto verde neon vibrante */
-        font-family: 'Press Start 2P', 'Courier New', Courier, monospace; /* Tente 'Press Start 2P' se tiver, senão Courier New */
+        color: #00FF00; /* Texto verde neon padrão */
+        font-family: 'Press Start 2P', monospace; /* Fonte pixelada principal */
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
         margin: 0;
-        overflow: hidden;
-        /* Efeito de Scanlines sutis (opcional, mas adiciona muito) */
-        background-image: linear-gradient(rgba(0, 100, 0, 0.1) 1px, transparent 1px);
-        background-size: 100% 2px;
+        overflow: hidden; /* Garante que não apareçam barras de rolagem */
+        /* Efeito de Scanlines CRT bem visível */
+        background-image:
+            linear-gradient(rgba(0, 255, 0, 0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 0, 0.04) 1px, transparent 1px);
+        background-size: 2px 2px;
         background-position: 0 0;
+        animation: scanlineAnimation 8s linear infinite; /* Animação sutil de scanline */
+    }
+
+    /* Animação para simular o movimento das scanlines */
+    @keyframes scanlineAnimation {
+        from { background-position: 0 0; }
+        to { background-position: 0 200%; }
     }
 
     .control-panel {
-        background-color: #0A0A0A; /* Fundo do painel um pouco menos preto que o body */
-        border: 2px solid #00AA00; /* Borda verde mais intensa */
-        padding: 25px; /* Um pouco mais de padding */
-        border-radius: 4px; /* Bordas menos arredondadas */
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.6); /* Brilho verde mais forte */
-        width: 95%; /* Ocupa mais largura */
-        max-width: 900px; /* Maior largura máxima */
+        background-color: #050505; /* Fundo do painel quase preto */
+        border: 2px solid #00AA00; /* Borda externa verde forte */
+        padding: 30px; /* Mais padding */
+        border-radius: 0; /* Bordas totalmente retas */
+        box-shadow: 0 0 40px rgba(0, 255, 0, 0.7); /* Brilho verde intenso */
+        width: 95%;
+        max-width: 950px; /* Um pouco mais largo */
         display: grid;
-        grid-template-columns: 1.2fr 1fr; /* Coluna de botões um pouco maior */
-        gap: 30px; /* Mais espaço entre as seções */
-        position: relative; /* Para efeitos futuros */
-        /* Pseudo-elemento para simular reflexo de tela ou poeira */
+        grid-template-columns: 1.5fr 1fr; /* Coluna de botões mais proeminente */
+        gap: 40px; /* Mais espaçamento entre as seções */
+        position: relative; /* Para a simulação de reflexo */
+        /* Efeito de Reflexo / Poeira / Imperfeição de tela CRT */
         &::before {
             content: '';
             position: absolute;
@@ -41,20 +54,30 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, rgba(0, 0, 0, 0.1) 0%, transparent 70%);
-            pointer-events: none;
+            background: linear-gradient(to bottom right, rgba(0, 255, 0, 0.05) 0%, transparent 50%, rgba(0, 255, 0, 0.05) 100%);
+            pointer-events: none; /* Permite clicar nos elementos por baixo */
             z-index: 1;
+            opacity: 0.8;
         }
     }
 
-    h1 {
-        grid-column: 1 / -1;
+    h1, h2 {
+        grid-column: 1 / -1; /* Ocupa todas as colunas */
         text-align: center;
         color: #00FF00;
-        text-shadow: 0 0 15px rgba(0, 255, 0, 0.8), 0 0 25px rgba(0, 255, 0, 0.4); /* Brilho de texto mais intenso */
-        margin-bottom: 25px;
-        font-size: 2.5em; /* Título maior */
-        letter-spacing: 2px; /* Espaçamento entre letras */
+        text-shadow: 0 0 18px rgba(0, 255, 0, 0.9), 0 0 30px rgba(0, 255, 0, 0.5); /* Brilho de texto muito forte */
+        margin-bottom: 30px;
+        font-size: 3em; /* Títulos grandes e chamativos */
+        letter-spacing: 4px; /* Espaçamento de letras tipo terminal */
+        word-wrap: break-word; /* Garante que o texto se quebre em telas menores */
+    }
+
+    h2 {
+        font-size: 2em;
+        color: #00FFFF; /* Ciano para subtítulos, mais comum em terminais antigos */
+        text-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.4);
+        margin-bottom: 15px;
+        letter-spacing: 2px;
     }
 
     /* Seção de Botões */
@@ -62,33 +85,35 @@
         grid-column: 1;
         display: flex;
         flex-direction: column;
-        gap: 20px; /* Mais espaço entre botões */
+        gap: 25px; /* Mais espaço entre os "botões físicos" */
     }
 
     .action-button {
-        background-color: #004400; /* Verde mais escuro para o botão */
+        background-color: #004400; /* Verde escuro do botão */
         color: #00FF00;
-        border: 2px solid #00AA00; /* Borda do botão mais definida */
-        padding: 18px; /* Mais padding no botão */
-        font-size: 1.3em; /* Fonte maior no botão */
+        border: 3px outset #00AA00; /* Borda 3D que simula botão físico */
+        padding: 20px;
+        font-size: 1.5em; /* Fonte maior para botões */
         cursor: pointer;
-        border-radius: 3px; /* Cantos menos arredondados */
-        transition: background-color 0.2s, box-shadow 0.2s, color 0.2s;
+        border-radius: 0; /* Sem bordas arredondadas */
+        transition: background-color 0.1s, box-shadow 0.1s, color 0.1s;
         text-align: center;
-        text-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
-        box-shadow: 0 0 10px rgba(0, 255, 0, 0.3); /* Sombra inicial do botão */
+        text-shadow: 0 0 10px rgba(0, 255, 0, 0.8); /* Brilho no texto do botão */
+        box-shadow: 5px 5px 15px rgba(0, 255, 0, 0.4); /* Sombra que simula profundidade */
+        letter-spacing: 1px;
     }
 
     .action-button:hover {
         background-color: #006600;
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.8); /* Brilho ao passar o mouse */
-        color: #33FF33; /* Cor mais clara no hover */
+        box-shadow: 5px 5px 20px rgba(0, 255, 0, 0.9);
+        color: #33FF33;
     }
 
     .action-button:active {
         background-color: #007700;
-        box-shadow: 0 0 25px rgba(0, 255, 0, 1.0);
-        transform: translateY(1px); /* Pequeno efeito de clique */
+        border-style: inset; /* Simula o botão sendo pressionado */
+        box-shadow: 2px 2px 10px rgba(0, 255, 0, 0.6); /* Sombra menor ao pressionar */
+        transform: translateY(2px); /* Pequeno deslocamento ao pressionar */
     }
 
     /* Seção de Status */
@@ -96,53 +121,45 @@
         grid-column: 2;
         display: flex;
         flex-direction: column;
-        gap: 20px; /* Mais espaço entre itens de status */
-    }
-
-    h2 {
-        color: #00FFFF; /* Ciano para subtítulos */
-        text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
-        font-size: 1.8em;
-        margin-bottom: 10px;
-        letter-spacing: 1px;
+        gap: 20px; /* Espaço entre itens de status */
     }
 
     .status-item {
         display: flex;
         align-items: center;
-        gap: 15px; /* Mais espaço entre luz e texto */
-        font-size: 1.2em; /* Fonte maior para status */
-        background-color: #050505; /* Fundo mais escuro para o item */
-        border: 1px solid #006600;
-        padding: 15px; /* Mais padding */
-        border-radius: 4px;
-        box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.2); /* Sombra interna sutil */
+        gap: 20px; /* Mais espaço entre luz e texto */
+        font-size: 1.3em; /* Fonte maior para status */
+        background-color: #030303; /* Fundo mais escuro para o item de status */
+        border: 1px dashed #008800; /* Borda tracejada */
+        padding: 18px;
+        border-radius: 0;
+        box-shadow: inset 0 0 8px rgba(0, 255, 0, 0.3); /* Sombra interna sutil */
     }
 
     .status-light {
-        width: 25px; /* Luz maior */
-        height: 25px;
+        width: 30px; /* Luz bem maior */
+        height: 30px;
         border-radius: 50%;
-        background-color: #444; /* Cor padrão */
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-        transition: background-color 0.3s, box-shadow 0.3s;
-        border: 1px solid #666; /* Borda da luz */
+        background-color: #333; /* Cor padrão */
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.5); /* Brilho de luz apagada */
+        transition: background-color 0.4s, box-shadow 0.4s;
+        border: 2px solid #555; /* Borda da luz */
     }
 
-    /* Cores dos status */
+    /* Cores dos status com brilho mais intenso */
     .status-light.green {
         background-color: #00FF00;
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.8), 0 0 30px rgba(0, 255, 0, 0.4);
+        box-shadow: 0 0 25px rgba(0, 255, 0, 1.0), 0 0 40px rgba(0, 255, 0, 0.6);
         border-color: #33FF33;
     }
     .status-light.red {
         background-color: #FF0000;
-        box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 30px rgba(255, 0, 0, 0.4);
+        box-shadow: 0 0 25px rgba(255, 0, 0, 1.0), 0 0 40px rgba(255, 0, 0, 0.6);
         border-color: #FF3333;
     }
     .status-light.yellow {
         background-color: #FFFF00;
-        box-shadow: 0 0 20px rgba(255, 255, 0, 0.8), 0 0 30px rgba(255, 255, 0, 0.4);
+        box-shadow: 0 0 25px rgba(255, 255, 0, 1.0), 0 0 40px rgba(255, 255, 0, 0.6);
         border-color: #FFFF33;
     }
 
@@ -150,41 +167,41 @@
     .section-countdown {
         grid-column: 1 / -1;
         text-align: center;
-        margin-top: 30px; /* Mais margem superior */
+        margin-top: 40px;
         background-color: #050505;
         border: 2px solid #00AA00;
-        padding: 20px;
-        border-radius: 6px;
-        box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.3);
+        padding: 25px;
+        border-radius: 0;
+        box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.4); /* Sombra interna mais forte */
     }
 
     .countdown-display {
-        font-size: 3.5em; /* Fonte ainda maior para o timer */
-        color: #00FFFF; /* Ciano para o timer */
-        text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.4);
-        margin-top: 15px;
-        letter-spacing: 3px; /* Mais espaçamento para o timer */
+        font-size: 4em; /* Fonte gigantesca para o timer */
+        color: #00FFFF;
+        text-shadow: 0 0 25px rgba(0, 255, 255, 1.0), 0 0 40px rgba(0, 255, 255, 0.6);
+        margin-top: 20px;
+        letter-spacing: 5px; /* Espaçamento de letras marcante */
     }
 
-    /* Pop-up de Mensagem */
+    /* Pop-up de Mensagem (também estilizado para a época) */
     .popup-message {
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background-color: rgba(0, 0, 0, 0.95); /* Mais opaco */
+        background-color: rgba(0, 0, 0, 0.98); /* Fundo quase opaco */
         color: #00FF00;
         border: 3px solid #00FF00;
-        padding: 25px 40px; /* Maior padding */
-        border-radius: 8px;
-        box-shadow: 0 0 40px rgba(0, 255, 0, 0.9);
+        padding: 30px 50px;
+        border-radius: 0;
+        box-shadow: 0 0 50px rgba(0, 255, 0, 1.0); /* Brilho extremo */
         z-index: 1000;
-        font-size: 1.8em; /* Fonte maior no pop-up */
+        font-size: 2em;
         text-align: center;
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
     }
     .popup-message.show {
         opacity: 1;
