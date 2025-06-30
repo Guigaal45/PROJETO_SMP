@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Controle da Base - SMP</title>
+    <style>
+        body {
+            background-color: #0a0a0a; /* Fundo bem escuro */
+            color: #00ff00; /* Texto verde neon padrão */
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Evita barras de rolagem */
+        }
+
+        .control-panel {
+            background-color: #1a1a1a;
+            border: 2px solid #006600; /* Borda verde escura */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4); /* Brilho verde */
+            width: 90%;
+            max-width: 800px;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Duas colunas */
+            gap: 20px;
+        }
+
+        h1 {
+            grid-column: 1 / -1; /* O título ocupa todas as colunas */
+            text-align: center;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+            margin-bottom: 20px;
+        }
+
+        /* Seção de Botões */
+        .section-buttons {
+            grid-column: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-button {
+            background-color: #003300; /* Verde escuro */
+            color: #00ff00;
+            border: 1px solid #006600;
+            padding: 15px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.4);
+        }
+
+        .action-button:hover {
+            background-color: #005500;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+        }
+
+        .action-button:active {
+            background-color: #007700;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+        }
+
+        /* Seção de Status */
+        .section-status {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+            background-color: #0a0a0a;
+            border: 1px solid #004400;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .status-light {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #555; /* Cor padrão */
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* Cores dos status */
+        .status-light.green {
+            background-color: #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        }
+        .status-light.red {
+            background-color: #ff0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+        }
+        .status-light.yellow {
+            background-color: #ffff00;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.8);
+        }
+
+        /* Seção de Contador Regressivo */
+        .section-countdown {
+            grid-column: 1 / -1; /* Ocupa todas as colunas */
+            text-align: center;
+            margin-top: 20px;
+            background-color: #0a0a0a;
+            border: 1px solid #004400;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .countdown-display {
+            font-size: 2.5em;
+            color: #00ffff; /* Ciano para o timer */
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+            margin-top: 10px;
+        }
+
+        /* Pop-up de Mensagem */
+        .popup-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+            z-index: 1000;
+            font-size: 1.5em;
+            text-align: center;
+            opacity: 0; /* Começa invisível */
+            visibility: hidden; /* Esconde completamente */
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .popup-message.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <h1>Centro de Controle da Base</h1>
+
+        <div class="section-buttons">
+            <button class="action-button" onclick="ativarDefesas()">Ativar Defesas</button>
+            <button class="action-button" onclick="abrirPortao()">Abrir Portão Principal</button>
+            <button class="action-button" onclick="alterarStatus('SistemaPrincipal', 'red')">Simular Falha Sistema</button>
+            <button class="action-button" onclick="alterarStatus('SistemaPrincipal', 'green')">Restaurar Sistema</button>
+        </div>
+
+        <div class="section-status">
+            <h2>Status dos Sistemas</h2>
+            <div class="status-item">
+                <div id="statusEnergia" class="status-light green"></div>
+                <span>Energia Principal: <span id="energiaText">ONLINE</span></span>
+            </div>
+            <div class="status-item">
+                <div id="statusSistemaPrincipal" class="status-light green"></div>
+                <span>Sistema Principal: <span id="sistemaPrincipalText">OPERACIONAL</span></span>
+            </div>
+            <div class="status-item">
+                <div id="statusDefesas" class="status-light red"></div>
+                <span>Defesas Externas: <span id="defesasText">INATIVAS</span></span>
+            </div>
+        </div>
+
+        <div class="section-countdown">
+            <h2>Próximo Evento: Invasão Iminente!</h2>
+            <div id="countdown" class="countdown-display"></div>
+        </div>
+    </div>
+
+    <div id="popup" class="popup-message"></div>
+
+    <script>
+        // Funções para os Botões
+        function showPopup(message) {
+            const popup = document.getElementById('popup');
+            popup.textContent = message;
+            popup.classList.add('show');
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 2000); // O pop-up desaparece depois de 2 segundos
+        }
+
+        function ativarDefesas() {
+            showPopup('DEFESAS ATIVADAS! Alerta Laranja.');
+            document.getElementById('statusDefesas').classList.remove('red');
+            document.getElementById('statusDefesas').classList.add('yellow');
+            document.getElementById('defesasText').textContent = 'ATIVAS';
+        }
+
+        function abrirPortao() {
+            showPopup('PORTÃO PRINCIPAL ABERTO! Aguarde...');
+            // Exemplo de como você poderia mudar um status aqui
+            // document.getElementById('statusEnergia').classList.remove('green');
+            // document.getElementById('statusEnergia').classList.add('yellow');
+            // document.getElementById('energiaText').textContent = 'VARIÁVEL';
+        }
+
+        // Função para Alterar Status dos Indicadores
+        function alterarStatus(id, newStatus) {
+            const statusLight = document.getElementById('status' + id);
+            const statusText = document.getElementById(id + 'Text');
+
+            // Remove todas as classes de cor e adiciona a nova
+            statusLight.classList.remove('green', 'red', 'yellow');
+            statusLight.classList.add(newStatus);
+
+            // Muda o texto descritivo
+            if (id === 'Energia') {
+                statusText.textContent = newStatus === 'green' ? 'ONLINE' : (newStatus === 'red' ? 'CRÍTICA' : 'VARIÁVEL');
+            } else if (id === 'SistemaPrincipal') {
+                statusText.textContent = newStatus === 'green' ? 'OPERACIONAL' : (newStatus === 'red' ? 'FALHA CRÍTICA' : 'ANOMALIA');
+            } else if (id === 'Defesas') {
+                statusText.textContent = newStatus === 'green' ? 'ATIVAS' : (newStatus === 'red' ? 'INATIVAS' : 'ALERTA');
+            }
+        }
+
+
+        // Contador Regressivo
+        const countdownElement = document.getElementById('countdown');
+        // Defina a data/hora do seu evento (Ano, Mês-1, Dia, Hora, Minuto, Segundo)
+        // Exemplo: 1º de Julho de 2025, 18:00:00
+        const eventDate = new Date(2025, 6, 1, 18, 0, 0).getTime(); // Mês é 0-indexado (Julho = 6)
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = eventDate - now;
+
+            // Cálculos de tempo
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Exibir o resultado
+            if (distance > 0) {
+                countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            } else {
+                countdownElement.innerHTML = "INVASÃO INICIADA!";
+                countdownElement.style.color = 'red';
+                countdownElement.style.textShadow = '0 0 20px rgba(255, 0, 0, 0.8)';
+            }
+        }
+
+        // Atualiza o contador a cada segundo
+        setInterval(updateCountdown, 1000);
+        // Chama uma vez imediatamente para evitar atraso no primeiro display
+        updateCountdown();
+
+        // Inicializa o status das defesas como Inativas/Vermelho
+        alterarStatus('Defesas', 'red');
+
+    </script>
+</body>
+</html>
