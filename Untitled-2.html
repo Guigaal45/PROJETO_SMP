@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sistema de Segurança - ERRO</title>
+<style>
+    body {
+        background-color: #1a1a1a; /* Fundo bem escuro */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Ocupa a altura total da tela */
+        margin: 0;
+        font-family: 'Courier New', Courier, monospace;
+        color: #e0e0e0; /* Cor do texto claro */
+    }
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+        grid-template-rows: repeat(2, 1fr); /* 2 linhas */
+        gap: 10px; /* Espaço entre as imagens */
+        max-width: 90vw; /* Largura máxima da grade */
+        max-height: 90vh; /* Altura máxima da grade */
+        border: 2px solid #333; /* Borda ao redor do painel */
+        padding: 10px;
+        background-color: #0d0d0d; /* Fundo do painel */
+    }
+    .camera-feed {
+        width: 100%;
+        height: 100%;
+        background-color: #000; /* Fundo preto para as "telas" */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden; /* Garante que a imagem não saia da borda */
+        border: 1px solid #444; /* Borda individual da câmera */
+    }
+    .camera-feed img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Garante que a imagem preencha o espaço sem distorcer muito */
+        display: block;
+    }
+    .error-message {
+        position: absolute;
+        color: red;
+        font-size: 2em;
+        text-shadow: 0 0 5px black;
+        z-index: 10; /* Garante que a mensagem fique por cima da imagem */
+    }
+</style>
+</head>
+<body>
+
+<div class="grid-container">
+    <div class="camera-feed">
+        <img src="https://cdn.discordapp.com/attachments/1163547157572354131/1389331582241996821/assets2Ftask_01jz15q7wbf6kajw816jfdfh882F1751312539_img_1.png?ex=68643b5d&is=6862e9dd&hm=de0fe561d7ccf3f85106d01c271b105c7333ce3f71b47945fd42488532ec1b69&" alt="Câmera 1 - Sem Sinal">
+        </div>
+    <div class="camera-feed">
+        <img src="https://cdn.discordapp.com/attachments/1163547157572354131/1389332834275164340/assets2Ftask_01jz1699tff21at5jhcbvgqtta2F1751313137_img_0.png?ex=68643c88&is=6862eb08&hm=84625bbd7f5dbc3dd9f1e8829b5821596caea5144ff273c23dbe18e291af9edb&" alt="Câmera 2 - Desconectada">
+        </div>
+    <div class="camera-feed">
+        <img src="https://cdn.discordapp.com/attachments/1163547157572354131/1389331610306088960/assets2Ftask_01jz15w45sfymagene953dnk582F1751312660_img_0.png?ex=68643b64&is=6862e9e4&hm=c1ab5c59240cfe0d89be5b67bf3d3caf4e7cdf479375c6d28049a5ab984fbd8f&" alt="Câmera 3 - Estática">
+        </div>
+    <div class="camera-feed">
+        <img src="https://cdn.discordapp.com/attachments/1163547157572354131/1389332988453720235/assets2Ftask_01jz16byf9etdt0h9yp3nnbfx22F1751313181_img_0.png?ex=68643cad&is=6862eb2d&hm=e0d693a9d4619e613f700eed095069570ae77f2d06af0f02e8664323efa5869f&" alt="Câmera 4 - Offline">
+        </div>
+</div>
+
+</body>
+</html>
